@@ -214,6 +214,7 @@ fabric.properties
 config/local_settings.py
 
 .env
+.idea
 
 **/migrations/*
 /migrations/*.py
