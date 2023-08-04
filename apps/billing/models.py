@@ -57,7 +57,8 @@ class BankCard(BaseModel):
     cvv = models.CharField(max_length=3,
                            validators=[validate_cvv],
                            help_text='Введите CVV код карты в формате 3 цифр',
-                           verbose_name='CVV'
+                           verbose_name='CVV',
+                           null=True, blank=True
                            )
 
     class Meta:
