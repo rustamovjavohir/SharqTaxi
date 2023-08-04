@@ -1,8 +1,10 @@
+import uuid
+
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from apps.billing import cosntants
-from utils.choices import PaymentTypeChoices
+from utils import choices
 from utils.models import BaseModel
 from apps.auth_user.models import UserClient, UserDriver, User
 
@@ -34,6 +36,7 @@ def validate_cvv(value):
 
 
 class BankCard(BaseModel):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     client = models.ForeignKey(UserClient,
                                on_delete=models.CASCADE,
                                related_name='cards',
@@ -78,6 +81,7 @@ class BankCard(BaseModel):
 
 
 class Promotion(BaseModel):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=255,
                             verbose_name='Название'
                             )
@@ -110,14 +114,15 @@ class Promotion(BaseModel):
 
 
 class UserPayment(BaseModel):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     client = models.ForeignKey(UserClient,
                                on_delete=models.CASCADE,
                                related_name='user_payments',
                                verbose_name='Пользователь'
                                )
     payment_method = models.CharField(max_length=255,
-                                      choices=PaymentTypeChoices.choices,
-                                      default=PaymentTypeChoices.CASH,
+                                      choices=choices.PaymentTypeChoices.choices,
+                                      default=choices.PaymentTypeChoices.CASH,
                                       verbose_name='Метод оплаты'
                                       )
     card = models.ForeignKey(BankCard,
@@ -137,6 +142,11 @@ class UserPayment(BaseModel):
                                  verbose_name='Сумма платежа',
                                  validators=[MinValueValidator(0.01)]
                                  )
+    currency = models.CharField(max_length=255,
+                                choices=choices.CurrencyChoices.choices,
+                                default=choices.CurrencyChoices.UZS,
+                                verbose_name='Валюта'
+                                )
 
     class Meta:
         verbose_name = 'Платеж'

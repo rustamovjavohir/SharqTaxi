@@ -63,3 +63,10 @@ class TripStatusChoices(TextChoices):
     CANCELED_BY_DRIVER = "canceled_by_driver", "Отменен водителем"
     IN_PROGRESS = "in_progress", "В процессе"
     COMPLETED = "completed", "Завершен"
+
+
+class CurrencyChoices(TextChoices):
+    USD = "USD", "Доллар"
+    EUR = "EUR", "Евро"
+    RUB = "RUB", "Рубль"
+    UZS = "UZS", "Сум"

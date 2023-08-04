@@ -13,6 +13,7 @@ class UserPaymentSerializer(serializers.ModelSerializer):
             'client',
             'payment_method',
             'amount',
+            'currency',
             'is_active',
             'created_at',
             'updated_at'

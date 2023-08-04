@@ -12,3 +12,5 @@ BANK_CARD_SUCCESSFULLY_UPDATED = 'Банковская карта успешно
 BANK_CARD_SUCCESSFULLY_DELETED = 'Банковская карта успешно удалена'
 BANK_CARD_SUCCESSFULLY_ACTIVATED = 'Банковская карта успешно активирована'
 BANK_CARD_SUCCESSFULLY_DEACTIVATED = 'Банковская карта успешно деактивирована'
+
+
