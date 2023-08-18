@@ -192,6 +192,18 @@ LOGIN_REDIRECT_URL = '/'
 
 SITE_ID = 2
 
+# ------------------------------------------------PAYME-----------------------------------------------------------------
+PAYME_SETTINGS = {
+    'DEBUG': DEBUG,  # True - test, False - production
+    'ID': env.str("PAYME_ID"),
+    'SECRET_KEY': env.str('TEST_KEY') if DEBUG else env.str('PRO_KEY'),
+    'PAYME_MIN_AMOUNT': 10,
+    'PAYME_ACCOUNT': {
+        'KEY_1': 'order_id'
+    },
+    'PAYME_CALLBACK_URL': 'https://rustamovjavohir.jprq.live',
+}
+
 # ------------------------------------------EMAIL_SETTINGS--------------------------------------------------------------
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'

@@ -1,8 +1,10 @@
+import uuid
+
 from django.core.exceptions import ValidationError
-from django.core.validators import MaxValueValidator, MinValueValidator
+from django.core.validators import MinValueValidator
 from django.db import models
 from apps.billing import cosntants
-from utils.choices import PaymentTypeChoices
+from utils import choices
 from utils.models import BaseModel
 from apps.auth_user.models import UserClient, UserDriver, User
 
@@ -34,6 +36,7 @@ def validate_cvv(value):
 
 
 class BankCard(BaseModel):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     client = models.ForeignKey(UserClient,
                                on_delete=models.CASCADE,
                                related_name='cards',
@@ -57,7 +60,8 @@ class BankCard(BaseModel):
     cvv = models.CharField(max_length=3,
                            validators=[validate_cvv],
                            help_text='Введите CVV код карты в формате 3 цифр',
-                           verbose_name='CVV'
+                           verbose_name='CVV',
+                           null=True, blank=True
                            )
 
     class Meta:
@@ -77,6 +81,7 @@ class BankCard(BaseModel):
 
 
 class Promotion(BaseModel):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=255,
                             verbose_name='Название'
                             )
@@ -109,14 +114,15 @@ class Promotion(BaseModel):
 
 
 class UserPayment(BaseModel):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     client = models.ForeignKey(UserClient,
                                on_delete=models.CASCADE,
                                related_name='user_payments',
                                verbose_name='Пользователь'
                                )
     payment_method = models.CharField(max_length=255,
-                                      choices=PaymentTypeChoices.choices,
-                                      default=PaymentTypeChoices.CASH,
+                                      choices=choices.PaymentTypeChoices.choices,
+                                      default=choices.PaymentTypeChoices.CASH,
                                       verbose_name='Метод оплаты'
                                       )
     card = models.ForeignKey(BankCard,
@@ -131,11 +137,20 @@ class UserPayment(BaseModel):
                                   verbose_name='Промокод',
                                   blank=True, null=True
                                   )
-    amount = models.DecimalField(max_digits=10,
-                                 decimal_places=2,
-                                 verbose_name='Сумма платежа',
-                                 validators=[MinValueValidator(0.01)]
+    amount = models.IntegerField(verbose_name='Сумма платежа (в тиынах)',
+                                 validators=[MinValueValidator(1)],
+                                 help_text='Введите сумму платежа в тиынах'
                                  )
+    currency = models.CharField(max_length=255,
+                                choices=choices.CurrencyChoices.choices,
+                                default=choices.CurrencyChoices.UZS,
+                                verbose_name='Валюта'
+                                )
+    status = models.CharField(max_length=255,
+                              choices=choices.PaymentStatusChoices.choices,
+                              default=choices.PaymentStatusChoices.PENDING,
+                              verbose_name='Статус'
+                              )
 
     class Meta:
         verbose_name = 'Платеж'

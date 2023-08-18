@@ -24,3 +24,10 @@ def generate_password(length: int = 10) -> str:
 def gen_unique_cod():
     """Generate unique code. like 1690191397227819800d9d03cffab744127b835d4ce0c096d0f """
     return f"{time_ns()}{str(uuid4()).replace('-', '')}"
+
+
+def gen_uuid4_code():
+    """
+    Generate unique code. like 210e90d9-3619-49fe-9be6-072f8369b8bb
+    """
+    return uuid4().__str__()

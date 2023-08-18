@@ -1,3 +1,5 @@
+from django.http import Http404
+
 from apps.auth_user.permissions import DenyAll
 from utils.responses import Response
 
@@ -81,6 +83,8 @@ class ReturnResponseMixin(object):
             error = exc.detail
         elif getattr(exc, 'message', None):
             error = exc.message
+        elif isinstance(exc, Http404):
+            error = f'{self.queryset.model.__name__} object не найдено'
         return Response(error=error, status=getattr(exc, 'status_code', 400), success=False)
 
 
