@@ -13,8 +13,8 @@ from apps.billing.payme.methods.cancel_transaction import CancelTransaction
 from apps.billing.payme.methods.create_transaction import CreateTransaction
 from apps.billing.payme.methods.generate_link import GeneratePayLink
 from apps.billing.payme.methods.perform_transaction import PerformTransaction
-from repository.billing import PaymeRepository, PaymeMerchantRepository
 from apps.billing.payme import methods
+from repository.billing import PaymeRepository, PaymeMerchantRepository
 
 
 class PaymeService:
@@ -25,39 +25,34 @@ class PaymeService:
         self.payme_repository = PaymeRepository()
 
     def create_card(self, **kwargs):
-        data = dict(
-            id=kwargs['id'],
-            method=methods.CARD_CREATE,
-            params=dict(
-                card=dict(
-                    number=kwargs['params']['card']['number'],
-                    expire=kwargs['params']['card']['expire'],
-                ),
-                amount=kwargs['params']['amount'],
-                save=kwargs['params']['save']
-            )
-        )
-        response = requests.post(PAYME_URL, json=data, headers=AUTHORIZATION)
+        data = kwargs
+        data.update({'method': methods.CARD_CREATE})
+        response = requests.post(f"{PAYME_URL}/api", json=kwargs, headers=AUTHORIZATION)
         result = response.json()
         if 'error' in result:
             return result
 
         token = result['result']['card']['token']
+        card_data = {
+            "pan": kwargs.get('params').get('card').get('number'),
+            "expiration_date": kwargs.get('params').get('card').get('expire'),
+            "token": token
+        }
+        self.payme_repository.create_bank_card(**card_data)
         return self.get_card_verify_code(token)
 
     def get_card_verify_code(self, token):
-        self.payme_repository.get_bank_card_by_number(token)  # TODO: remove this line
         data = dict(
             method=methods.CARD_GET_VERIFY_CODE,
             params=dict(
                 token=token
             )
         )
-        response = requests.post(PAYME_URL, json=data, headers=AUTHORIZATION)
+        response = requests.post(f"{PAYME_URL}/api", json=data, headers=AUTHORIZATION)
         result = response.json()
         if 'error' in result:
             return result
-
+        self.payme_repository.get_bank_card_by_number(token)
         result.update(token=token)
         return result
 

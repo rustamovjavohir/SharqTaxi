@@ -51,7 +51,8 @@ class BankCard(BaseModel):
                            )
     card_holder = models.CharField(max_length=255,
                                    validators=[validate_card_holder],
-                                   verbose_name='Держатель карты'
+                                   verbose_name='Держатель карты',
+                                   null=True, blank=True
                                    )
     expiration_date = models.CharField(max_length=4,
                                        help_text='Введите срок действия карты в формате ММГГ',
@@ -63,6 +64,17 @@ class BankCard(BaseModel):
                            verbose_name='CVV',
                            null=True, blank=True
                            )
+    status = models.CharField(max_length=255,
+                              choices=choices.BankCardStatusChoices.choices,
+                              default=choices.BankCardStatusChoices.PENDING,
+                              verbose_name='Статус',
+                              null=True, blank=True
+                              )
+    token = models.CharField(max_length=255,
+                             verbose_name='Токен',
+                             null=True, blank=True
+                             )
+    is_active = models.BooleanField(default=False, verbose_name='Активна')
 
     class Meta:
         verbose_name = 'Банковская карта'

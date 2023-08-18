@@ -14,7 +14,7 @@ class UserPaymentAdmin(admin.ModelAdmin):
     ordering = ('-created_at',)
 
     def amount_pretty(self, obj):
-        amount = "{:,.2f}".format(obj.amount/100)
+        amount = "{:,.2f}".format(obj.amount / 100)
         return f'{amount} {obj.currency}'
 
     amount_pretty.short_description = 'Сумма'
@@ -39,9 +39,9 @@ class PromotionAdmin(admin.ModelAdmin):
 
 @admin.register(BankCard)
 class BankCardAdmin(admin.ModelAdmin):
-    list_display = ('id', 'client', 'secret_pan', 'card_holder', 'expiration_date', 'cvv', 'is_active')
+    list_display = ('id', 'client', 'secret_pan', 'card_holder', 'expiration_date', 'cvv', 'status', 'is_active')
     list_display_links = ('id', 'client',)
-    list_filter = ('client',)
+    list_filter = ('client', 'status')
     search_fields = ('id', 'client', 'pan', 'card_holder', 'cvv')
     list_per_page = 25
 

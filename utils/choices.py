@@ -56,6 +56,14 @@ class PaymentTypeChoices(TextChoices):
     BONUS = "bonus", "Бонусы"
 
 
+class BankCardStatusChoices(TextChoices):
+    PENDING = "pending", "Ожидание"
+    SEND_VERIFY_CODE = "send_verify_code", "Отправлен код подтверждения"
+    ACTIVE = "active", "Активный"
+    INACTIVE = "inactive", "Неактивный"
+    EXPIRED = "expired", "Истек срок действия"
+
+
 class PaymentStatusChoices(TextChoices):
     PENDING = "pending", "🕔Ожидание"
     CREATE_TRANSACTION = "create_transaction", "Создана транзакция"

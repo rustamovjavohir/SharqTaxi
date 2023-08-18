@@ -3,6 +3,7 @@ from drf_spectacular.utils import extend_schema
 
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 
 from api.billing.paginations import BillingPagination
 from api.mixins import HandleExceptionMixin
@@ -46,10 +47,12 @@ class PaymeGeneratePayLinkView(HandleExceptionMixin, GenericAPIView):
         return CustomResponse(data=result)
 
 
-class CardCreateApiView(HandleExceptionMixin, GenericAPIView):
+# class CardCreateApiView(HandleExceptionMixin, GenericAPIView):
+class CardCreateApiView(GenericAPIView):
     serializer_class = SubscribeSerializer
     queryset = PaymeTransaction.objects.all()
     pagination_class = BillingPagination
+    permission_classes = (IsAuthenticated,)
     service = PaymeService()
 
     @extend_schema(tags=[Payment.Payme.PREFIX])
