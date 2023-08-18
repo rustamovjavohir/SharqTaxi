@@ -4,6 +4,8 @@ CARD_EXPIRATION_DATE_MUST_BE_ONLY_DIGITS = 'Срок действия карты
 CARD_HOLDER_MUST_BE_ONLY_LETTERS = 'Держатель карты должен состоять только из букв'
 CVV_MUST_BE_3_DIGITS = 'CVV должен состоять из 3 цифр'
 CVV_MUST_BE_ONLY_DIGITS = 'CVV должен состоять только из цифр'
+INCORRECT_AMOUNT = 'Неверная сумма платежа'
+PAYMENT_ALREADY_PAID = 'Платеж уже оплачен'
 
 BANK_CARD_SUCCESSFULLY_CREATED = 'Банковская карта успешно создана'
 BANK_CARD_SUCCESSFULLY_UPDATED = 'Банковская карта успешно обновлена'

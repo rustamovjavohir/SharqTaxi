@@ -14,8 +14,19 @@ class CustomException(APIException):
         self.detail = self.message
 
 
+class NotAuthenticatedException(CustomException):
+    default_code = 'not_authenticated'
+    status_code = 401
+    default_message = 'Not authenticated'
+
+
+class BadRequestException(CustomException):
+    default_code = 'bad_request'
+    status_code = 400
+    default_message = 'Bad request'
+
+
 class NotFoundException(CustomException):
     default_code = 'not_found'
     status_code = 404
     default_message = 'Not found'
-

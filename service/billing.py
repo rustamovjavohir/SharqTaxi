@@ -5,6 +5,8 @@ from decimal import Decimal
 import requests
 from django.core.exceptions import ValidationError
 
+from apps.billing import constants
+from apps.billing.exeptions import IncorrectAmount
 from apps.billing.payme.config import (AUTHORIZATION, PAYME_URL, MERCHANT_KEY)
 from apps.billing.payme.exceptions import (PermissionDenied, MethodNotFound, PerformTransactionDoesNotExist)
 from apps.billing.payme.methods.cancel_transaction import CancelTransaction
@@ -61,7 +63,9 @@ class PaymeService:
 
     def generate_pay_link(self, order_id: str, amount: Decimal):
         """Generate pay link for each order for payme."""
-        self.payme_repository.get_active_payment_by_id(order_id)
+        payment = self.payme_repository.get_active_payment_by_id(order_id)
+        if payment.amount != amount:
+            raise IncorrectAmount(constants.INCORRECT_AMOUNT)
         return self.gen_link_class(order_id, amount).generate_link()
 
 
