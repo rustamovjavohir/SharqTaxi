@@ -9,7 +9,7 @@ from apps.billing.models import UserPayment, BankCard, Promotion
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from utils.swagger_tags import Mobile
 from drf_spectacular.utils import extend_schema
-from apps.billing import cosntants
+from apps.billing import constants
 
 
 class UserPaymentViewSet(ActionSerializerMixin, ActionPermissionMixin, ReturnResponseMixin, ModelViewSet):
@@ -83,11 +83,11 @@ class BankCardViewSet(ActionSerializerMixin, ActionPermissionMixin, ReturnRespon
 
     @extend_schema(tags=[Mobile.Client.CARD])
     def create(self, request, *args, **kwargs):
-        return super().create(request, message=cosntants.BANK_CARD_SUCCESSFULLY_CREATED, *args, **kwargs)
+        return super().create(request, message=constants.BANK_CARD_SUCCESSFULLY_CREATED, *args, **kwargs)
 
     @extend_schema(tags=[Mobile.Client.CARD])
     def update(self, request, *args, **kwargs):
-        return super().update(request, message=cosntants.BANK_CARD_SUCCESSFULLY_UPDATED, *args, **kwargs)
+        return super().update(request, message=constants.BANK_CARD_SUCCESSFULLY_UPDATED, *args, **kwargs)
 
     @extend_schema(tags=[Mobile.Client.CARD])
     def partial_update(self, request, *args, **kwargs):
@@ -95,4 +95,4 @@ class BankCardViewSet(ActionSerializerMixin, ActionPermissionMixin, ReturnRespon
 
     @extend_schema(tags=[Mobile.Client.CARD])
     def destroy(self, request, *args, **kwargs):
-        return super().destroy(request, message=cosntants.BANK_CARD_SUCCESSFULLY_DELETED, *args, **kwargs)
+        return super().destroy(request, message=constants.BANK_CARD_SUCCESSFULLY_DELETED, *args, **kwargs)

@@ -2,7 +2,7 @@ import time
 
 from django.db import transaction
 
-from apps.billing import cosntants
+from apps.billing import constants
 from apps.billing.payme.models import MerchantTransactionsModel
 from apps.billing.payme.exceptions import PerformTransactionDoesNotExist
 from api.billing.serializers.payme import MerchantTransactionsModelSerializer
@@ -34,9 +34,9 @@ class CancelTransaction:
                 if transactions.cancel_time == 0:
                     transactions.cancel_time = int(time.time() * 1000)
                 if transactions.perform_time == 0:
-                    transactions.state = cosntants.PAYME_TRANSACTION_CANCELLED
+                    transactions.state = constants.PAYME_TRANSACTION_CANCELLED
                 if transactions.perform_time != 0:
-                    transactions.state = cosntants.PAYME_TRANSACTION_CANCELLED_AFTER_COMPLETE
+                    transactions.state = constants.PAYME_TRANSACTION_CANCELLED_AFTER_COMPLETE
                 transactions.reason = clean_data.get("reason")
                 transactions.save()
 

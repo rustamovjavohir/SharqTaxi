@@ -60,6 +60,8 @@ class PaymeService:
         return result
 
     def generate_pay_link(self, order_id: str, amount: Decimal):
+        """Generate pay link for each order for payme."""
+        self.payme_repository.get_active_payment_by_id(order_id)
         return self.gen_link_class(order_id, amount).generate_link()
 
 

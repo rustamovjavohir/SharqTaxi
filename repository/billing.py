@@ -1,3 +1,5 @@
+import uuid
+
 from django.shortcuts import get_object_or_404
 
 from apps.billing.models import BankCard, UserPayment
@@ -9,6 +11,8 @@ from apps.billing.payme.methods.get_statement import GetStatement
 from apps.billing.payme.methods.perform_transaction import PerformTransaction
 from apps.billing.payme.models import PaymeTransaction
 from utils import choices
+from utils.exceptions import NotFoundException
+from apps.billing import constants
 
 
 class PaymeRepository:
@@ -21,6 +25,21 @@ class PaymeRepository:
 
     def create_bank_card(self, **kwargs) -> BankCard:
         return self.bank_card.objects.create(**kwargs)
+
+    def id_2_uuid(self, order_id) -> uuid.UUID:
+        try:
+            return uuid.UUID(order_id)
+        except ValueError:
+            raise NotFoundException(constants.PAYMENT_NOT_FOUND)
+
+    def get_active_payment_by_id(self, order_id) -> UserPayment:
+        payment = self.user_payment.objects.filter(is_active=True, id=self.id_2_uuid(order_id),
+                                                   status__in=(
+                                                       choices.PaymentStatusChoices.PENDING,
+                                                       choices.PaymentStatusChoices.CREATE_TRANSACTION)).first()
+        if not payment:
+            raise NotFoundException(constants.PAYMENT_NOT_FOUND)
+        return payment
 
 
 class PaymeMerchantRepository:

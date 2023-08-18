@@ -3,7 +3,7 @@ import uuid
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
 from django.db import models
-from apps.billing import cosntants
+from apps.billing import constants
 from utils import choices
 from utils.models import BaseModel
 from apps.auth_user.models import UserClient, UserDriver, User
@@ -11,28 +11,28 @@ from apps.auth_user.models import UserClient, UserDriver, User
 
 def validate_pan(value):
     if len(str(value)) != 16:
-        raise ValidationError(cosntants.PAN_MUST_BE_16_DIGITS)
+        raise ValidationError(constants.PAN_MUST_BE_16_DIGITS)
 
 
 def validate_expiration_date(value):
     value = str(value).replace(' ', '')
     if len(value) != 4:
-        raise ValidationError(cosntants.CARD_EXPIRATION_DATE_MUST_BE_4_DIGITS)
+        raise ValidationError(constants.CARD_EXPIRATION_DATE_MUST_BE_4_DIGITS)
     elif not value.isdigit():
-        raise ValidationError(cosntants.CARD_EXPIRATION_DATE_MUST_BE_ONLY_DIGITS)
+        raise ValidationError(constants.CARD_EXPIRATION_DATE_MUST_BE_ONLY_DIGITS)
 
 
 def validate_card_holder(value):
     if value.isdigit():
-        raise ValidationError(cosntants.CARD_HOLDER_MUST_BE_ONLY_LETTERS)
+        raise ValidationError(constants.CARD_HOLDER_MUST_BE_ONLY_LETTERS)
     str(value).capitalize()
 
 
 def validate_cvv(value):
     if len(str(value)) != 3:
-        raise ValidationError(cosntants.CVV_MUST_BE_3_DIGITS)
+        raise ValidationError(constants.CVV_MUST_BE_3_DIGITS)
     if not value.isdigit():
-        raise ValidationError(cosntants.CVV_MUST_BE_ONLY_DIGITS)
+        raise ValidationError(constants.CVV_MUST_BE_ONLY_DIGITS)
 
 
 class BankCard(BaseModel):
