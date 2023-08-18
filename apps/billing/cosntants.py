@@ -1,5 +1,3 @@
-from utils.choices import PaymentTypeChoices
-
 PAN_MUST_BE_16_DIGITS = 'Номер карты должен состоять из 16 цифр'
 CARD_EXPIRATION_DATE_MUST_BE_4_DIGITS = 'Срок действия карты должен состоять из 4 цифр'
 CARD_EXPIRATION_DATE_MUST_BE_ONLY_DIGITS = 'Срок действия карты должен состоять только из цифр'
@@ -13,4 +11,10 @@ BANK_CARD_SUCCESSFULLY_DELETED = 'Банковская карта успешно
 BANK_CARD_SUCCESSFULLY_ACTIVATED = 'Банковская карта успешно активирована'
 BANK_CARD_SUCCESSFULLY_DEACTIVATED = 'Банковская карта успешно деактивирована'
 
+PAYME_TRANSACTION_CREATED = 1
+PAYME_TRANSACTION_COMPLETED = 2
+PAYME_TRANSACTION_CANCELLED = -1
+PAYME_TRANSACTION_CANCELLED_AFTER_COMPLETE = -2
+
+PAYMENT_CAUSE = 'Оплата за услуги'
 

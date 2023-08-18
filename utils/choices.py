@@ -56,6 +56,14 @@ class PaymentTypeChoices(TextChoices):
     BONUS = "bonus", "Бонусы"
 
 
+class PaymentStatusChoices(TextChoices):
+    PENDING = "pending", "🕔Ожидание"
+    CREATE_TRANSACTION = "create_transaction", "Создана транзакция"
+    PAID = "paid", "✅Оплачено"
+    ACCEPTED = "accepted", "Принят"
+    CANCELED = "canceled", "❌Отменен"
+
+
 class TripStatusChoices(TextChoices):
     WAITING = "waiting", "Ожидание"
     ACCEPTED = "accepted", "Принят"
@@ -70,3 +78,9 @@ class CurrencyChoices(TextChoices):
     EUR = "EUR", "Евро"
     RUB = "RUB", "Рубль"
     UZS = "UZS", "Сум"
+
+
+class PaymeTransactionStatus(TextChoices):
+    PROCESS = "process", "В процессе"
+    CANCELED = "canceled", "Отменен"
+    COMPLETED = "completed", "Завершен"

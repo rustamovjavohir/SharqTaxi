@@ -1,7 +1,7 @@
 import uuid
 
 from django.core.exceptions import ValidationError
-from django.core.validators import MaxValueValidator, MinValueValidator
+from django.core.validators import MinValueValidator
 from django.db import models
 from apps.billing import cosntants
 from utils import choices
@@ -137,16 +137,20 @@ class UserPayment(BaseModel):
                                   verbose_name='Промокод',
                                   blank=True, null=True
                                   )
-    amount = models.DecimalField(max_digits=10,
-                                 decimal_places=2,
-                                 verbose_name='Сумма платежа',
-                                 validators=[MinValueValidator(0.01)]
+    amount = models.IntegerField(verbose_name='Сумма платежа (в тиынах)',
+                                 validators=[MinValueValidator(1)],
+                                 help_text='Введите сумму платежа в тиынах'
                                  )
     currency = models.CharField(max_length=255,
                                 choices=choices.CurrencyChoices.choices,
                                 default=choices.CurrencyChoices.UZS,
                                 verbose_name='Валюта'
                                 )
+    status = models.CharField(max_length=255,
+                              choices=choices.PaymentStatusChoices.choices,
+                              default=choices.PaymentStatusChoices.PENDING,
+                              verbose_name='Статус'
+                              )
 
     class Meta:
         verbose_name = 'Платеж'

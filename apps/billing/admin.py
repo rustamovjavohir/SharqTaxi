@@ -1,14 +1,17 @@
 from django.contrib import admin
 from apps.billing.models import UserPayment, Promotion, BankCard
+from apps.billing.payme.models import MerchantTransactionsModel
 
 
 @admin.register(UserPayment)
 class UserPaymentAdmin(admin.ModelAdmin):
-    list_display = ('id', 'client', 'amount', 'payment_method', 'is_active')
+    list_display = ('id', 'client', 'amount', 'payment_method', 'status', 'is_active', 'created_at')
     list_display_links = ('id', 'client',)
-    list_filter = ('client', 'payment_method')
+    list_filter = ('client', 'status', 'payment_method')
     search_fields = ('client', 'payment_method')
     list_per_page = 25
+    readonly_fields = ('updated_at', 'created_at')
+    ordering = ('-created_at',)
 
     class Meta:
         verbose_name = 'Платеж'
@@ -44,3 +47,16 @@ class BankCardAdmin(admin.ModelAdmin):
         return obj.secret_pan  # TODO: change to musk_pan
 
     secret_pan.short_description = 'Номер карты'
+
+
+@admin.register(MerchantTransactionsModel)
+class MerchantTransactionsModelAdmin(admin.ModelAdmin):
+    list_display = ('id', '_id', 'order', 'amount', 'state', 'reason', 'time', 'perform_time')
+    list_display_links = ('id', '_id',)
+    list_filter = ('order',)
+    search_fields = ('id', 'order_id', 'amount', 'time', 'perform_time')
+    list_per_page = 25
+
+    class Meta:
+        verbose_name = 'Транзакция'
+        verbose_name_plural = 'Транзакции'
