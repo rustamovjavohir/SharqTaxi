@@ -5,13 +5,19 @@ from apps.billing.payme.models import MerchantTransactionsModel
 
 @admin.register(UserPayment)
 class UserPaymentAdmin(admin.ModelAdmin):
-    list_display = ('id', 'client', 'amount', 'payment_method', 'status', 'is_active', 'created_at')
+    list_display = ('id', 'client', 'amount_pretty', 'payment_method', 'status', 'is_active', 'created_at')
     list_display_links = ('id', 'client',)
     list_filter = ('client', 'status', 'payment_method')
     search_fields = ('client', 'payment_method')
     list_per_page = 25
     readonly_fields = ('updated_at', 'created_at')
     ordering = ('-created_at',)
+
+    def amount_pretty(self, obj):
+        amount = "{:,.2f}".format(obj.amount/100)
+        return f'{amount} {obj.currency}'
+
+    amount_pretty.short_description = 'Сумма'
 
     class Meta:
         verbose_name = 'Платеж'
