@@ -11,6 +11,7 @@ from api.mixins import HandleExceptionMixin
 from api.billing.serializers.payme import (SubscribeSerializer, MerchantSerializer, PaymeGeneratePayLinkSerializer,
                                            VerifyCardSerializer, RemoveCardSerializer)
 from apps.auth_user.permissions import IsOwnerClientCard
+from apps.billing import constants
 from apps.billing.payme.models import PaymeTransaction, MerchantTransactionsModel
 from apps.billing.models import UserPayment
 from utils.swagger_tags import Payment
@@ -97,4 +98,4 @@ class RemoveCardApiView(HandleExceptionMixin, GenericAPIView):
 
         result = self.service.remove_card(**serializer.validated_data)
 
-        return CustomResponse(result)
+        return CustomResponse(result, message=constants.BANK_CARD_SUCCESSFULLY_DELETED)

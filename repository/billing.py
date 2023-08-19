@@ -53,6 +53,9 @@ class PaymeRepository:
     def in_or_active_card(self, pan: str, active: bool) -> None:
         self.bank_card.objects.filter(pan=pan).update(is_active=active, updated_at=timezone.now())
 
+    def card_update(self, pan: str, **kwargs) -> None:
+        self.bank_card.objects.filter(pan=pan).update(**kwargs, updated_at=timezone.now())
+
 
 class PaymeMerchantRepository:
     available_methods: dict = {

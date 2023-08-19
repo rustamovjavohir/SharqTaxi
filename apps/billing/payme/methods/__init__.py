@@ -1,6 +1,7 @@
 CARD_CREATE = 'cards.create'
 CARD_VERIFY = 'cards.verify'
 CARD_REMOVE = 'cards.remove'
+CARD_CHECK = 'cards.check'
 CARD_GET_VERIFY_CODE = 'cards.get_verify_code'
 RECEIPTS_CREATE = 'receipts.create'
 RECEIPTS_PAY = 'receipts.pay'

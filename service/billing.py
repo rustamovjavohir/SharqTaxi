@@ -70,7 +70,10 @@ class PaymeService:
         result = response.json()
         if 'error' in result:
             raise ServerErrorException(message=result['error'])
-        self.payme_repository.change_card_status(pan, BankCardStatusChoices.SEND_VERIFY_CODE)
+        self.payme_repository.card_update(pan, **{
+            "status": BankCardStatusChoices.SEND_VERIFY_CODE,
+            "token": token
+        })
         return result.get('result')
 
     def card_verify(self, **kwargs):
@@ -86,24 +89,46 @@ class PaymeService:
         result = response.json()
         if 'error' in result:
             raise ServerErrorException(message=result['error'])
-        self.payme_repository.change_card_status(card.pan, BankCardStatusChoices.ACTIVE)
+        self.payme_repository.card_update(card.pan, **{
+            "status": BankCardStatusChoices.ACTIVE,
+            "token": card.token,
+            "is_active": True
+        })
         return result.get('result')
 
-    def remove_card(self, **kwargs):
+    def card_check(self, **kwargs):
+        card = self.payme_repository.get_bank_card_by_number(kwargs.get('pan'))
         data = dict(
-            id=kwargs.get('id'),
-            method=methods.CARD_REMOVE,
+            method=methods.CARD_CHECK,
             params=dict(
-                token=kwargs.get('token')
+                token=card.token
             )
         )
         response = requests.post(f"{PAYME_URL}/api", json=data, headers=AUTHORIZATION)
         result = response.json()
         if 'error' in result:
             raise ServerErrorException(message=result['error'])
-        self.payme_repository.change_card_status(kwargs.get('pan'), BankCardStatusChoices.INACTIVE)
-        self.payme_repository.in_or_active_card(kwargs.get('pan'), False)
         return result.get('result')
+
+    def remove_card(self, **kwargs):
+        card = self.payme_repository.get_bank_card_by_number(kwargs.get('pan'))
+        data = dict(
+            id=kwargs.get('id'),
+            method=methods.CARD_REMOVE,
+            params=dict(
+                token=card.token
+            )
+        )
+        response = requests.post(f"{PAYME_URL}/api", json=data, headers=AUTHORIZATION)
+        result = response.json()
+        if 'error' in result:
+            raise ServerErrorException(message=result['error'])
+        self.payme_repository.card_update(card.pan, **{
+            "status": BankCardStatusChoices.INACTIVE,
+            "token": card.token,
+            "is_active": False
+        })
+        return True
 
 
 class PaymeMerchantService:
