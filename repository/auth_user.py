@@ -2,6 +2,7 @@ import random
 
 from django.shortcuts import get_object_or_404
 
+from apps.auth_user import constants
 from apps.auth_user.models import User, UserRole, UserDriver, UserClient
 from apps.notifications.models import Token
 from repository.vehicle import VehicleRepository, DriverLicenseRepository
@@ -19,6 +20,13 @@ class UserRepository:
         self.sms_repository = None
         self.car_repository = VehicleRepository()
         self.license_repository = DriverLicenseRepository()
+
+    def get_user_by_uniq_id(self, identity: int) -> User:
+        if self.user_client.objects.filter(client_id=identity, is_active=True).exists():
+            return self.user_client.objects.get(client_id=identity).user
+        elif self.user_driver.objects.filter(driver_id=identity, is_active=True).exists():
+            return self.user_driver.objects.get(driver_id=identity).user
+        raise self.user.DoesNotExist(constants.USER_DOES_NOT_EXIST)
 
     def get_user_by_phone_number(self, phone_number: str) -> User:
         return get_object_or_404(self.user, phone_number=phone_number)

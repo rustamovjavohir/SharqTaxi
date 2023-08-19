@@ -39,10 +39,11 @@ class PromotionAdmin(admin.ModelAdmin):
 
 @admin.register(BankCard)
 class BankCardAdmin(admin.ModelAdmin):
-    list_display = ('id', 'client', 'secret_pan', 'card_holder', 'expiration_date', 'cvv', 'status', 'is_active')
-    list_display_links = ('id', 'client',)
-    list_filter = ('client', 'status')
-    search_fields = ('id', 'client', 'pan', 'card_holder', 'cvv')
+    list_display = ('id', 'user', 'secret_pan', 'card_holder', 'expiration_date', 'cvv', 'status', 'is_active')
+    list_display_links = ('id', 'user',)
+    list_filter = ('user', 'status')
+    search_fields = ('id', 'user', 'pan', 'card_holder', 'cvv')
+    readonly_fields = ('updated_at', 'created_at')
     list_per_page = 25
 
     class Meta:

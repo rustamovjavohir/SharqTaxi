@@ -15,6 +15,9 @@ from apps.billing.payme.methods.generate_link import GeneratePayLink
 from apps.billing.payme.methods.perform_transaction import PerformTransaction
 from apps.billing.payme import methods
 from repository.billing import PaymeRepository, PaymeMerchantRepository
+from repository.auth_user import UserRepository
+from utils.exceptions import ServerErrorException, BadRequestException
+from utils.choices import BankCardStatusChoices
 
 
 class PaymeService:
@@ -23,25 +26,40 @@ class PaymeService:
 
     def __init__(self):
         self.payme_repository = PaymeRepository()
+        self.user_repository = UserRepository()
+
+    def generate_pay_link(self, order_id: str, amount: Decimal):
+        """Generate pay link for each order for payme."""
+        payment = self.payme_repository.get_active_payment_by_id(order_id)
+        if payment.amount != amount:
+            raise IncorrectAmount(constants.INCORRECT_AMOUNT)
+        return self.gen_link_class(order_id, amount).generate_link()
 
     def create_card(self, **kwargs):
-        data = kwargs
-        data.update({'method': methods.CARD_CREATE})
+        kwargs.update(dict(
+            method=methods.CARD_CREATE
+        ))
         response = requests.post(f"{PAYME_URL}/api", json=kwargs, headers=AUTHORIZATION)
         result = response.json()
         if 'error' in result:
-            return result
-
+            raise ServerErrorException(message=result['error'])
         token = result['result']['card']['token']
         card_data = {
+            "user": self.user_repository.get_user_by_uniq_id(kwargs.get('id')),
             "pan": kwargs.get('params').get('card').get('number'),
             "expiration_date": kwargs.get('params').get('card').get('expire'),
             "token": token
         }
-        self.payme_repository.create_bank_card(**card_data)
-        return self.get_card_verify_code(token)
+        card, created = self.payme_repository.bank_card.objects.filter(pan=card_data.get('pan')).first(), False
+        if not card:
+            card, created = self.payme_repository.create_bank_card(**card_data)
+        elif card.is_active:
+            raise ValidationError(constants.BANK_CARD_ALREADY_EXISTS)
+        if card.updated_at_ms < constants.VERIFY_CODE_SECONDS and not created:
+            raise BadRequestException(constants.VERIFY_CODE_SENT)
+        return self.get_card_verify_code(card.pan, token)
 
-    def get_card_verify_code(self, token):
+    def get_card_verify_code(self, pan, token):
         data = dict(
             method=methods.CARD_GET_VERIFY_CODE,
             params=dict(
@@ -51,17 +69,41 @@ class PaymeService:
         response = requests.post(f"{PAYME_URL}/api", json=data, headers=AUTHORIZATION)
         result = response.json()
         if 'error' in result:
-            return result
-        self.payme_repository.get_bank_card_by_number(token)
-        result.update(token=token)
-        return result
+            raise ServerErrorException(message=result['error'])
+        self.payme_repository.change_card_status(pan, BankCardStatusChoices.SEND_VERIFY_CODE)
+        return result.get('result')
 
-    def generate_pay_link(self, order_id: str, amount: Decimal):
-        """Generate pay link for each order for payme."""
-        payment = self.payme_repository.get_active_payment_by_id(order_id)
-        if payment.amount != amount:
-            raise IncorrectAmount(constants.INCORRECT_AMOUNT)
-        return self.gen_link_class(order_id, amount).generate_link()
+    def card_verify(self, **kwargs):
+        card = self.payme_repository.get_bank_card_by_number(kwargs.get('pan'))
+        data = dict(
+            method=methods.CARD_VERIFY,
+            params=dict(
+                token=card.token,
+                code=kwargs.get('code')
+            )
+        )
+        response = requests.post(f"{PAYME_URL}/api", json=data, headers=AUTHORIZATION)
+        result = response.json()
+        if 'error' in result:
+            raise ServerErrorException(message=result['error'])
+        self.payme_repository.change_card_status(card.pan, BankCardStatusChoices.ACTIVE)
+        return result.get('result')
+
+    def remove_card(self, **kwargs):
+        data = dict(
+            id=kwargs.get('id'),
+            method=methods.CARD_REMOVE,
+            params=dict(
+                token=kwargs.get('token')
+            )
+        )
+        response = requests.post(f"{PAYME_URL}/api", json=data, headers=AUTHORIZATION)
+        result = response.json()
+        if 'error' in result:
+            raise ServerErrorException(message=result['error'])
+        self.payme_repository.change_card_status(kwargs.get('pan'), BankCardStatusChoices.INACTIVE)
+        self.payme_repository.in_or_active_card(kwargs.get('pan'), False)
+        return result.get('result')
 
 
 class PaymeMerchantService:

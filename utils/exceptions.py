@@ -30,3 +30,9 @@ class NotFoundException(CustomException):
     default_code = 'not_found'
     status_code = 404
     default_message = 'Not found'
+
+
+class ServerErrorException(CustomException):
+    default_code = 'server_error'
+    status_code = 500
+    default_message = 'Server error'

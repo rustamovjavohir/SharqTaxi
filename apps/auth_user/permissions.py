@@ -97,5 +97,5 @@ class IsOwnerClientCard(BasePermission):
     """
 
     def has_object_permission(self, request, view, obj):
-        return bool(obj.client == request.user.user_client
+        return bool(obj.user == request.user
                     or check_user_type(request=request, _type='is_superuser'))

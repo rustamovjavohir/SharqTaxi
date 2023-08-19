@@ -3,6 +3,8 @@ import uuid
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
 from django.db import models
+from django.utils import timezone
+
 from apps.billing import constants
 from utils import choices
 from utils.models import BaseModel
@@ -37,12 +39,12 @@ def validate_cvv(value):
 
 class BankCard(BaseModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    client = models.ForeignKey(UserClient,
-                               on_delete=models.CASCADE,
-                               related_name='cards',
-                               verbose_name='Пользователь',
-                               null=True, blank=True
-                               )
+    user = models.ForeignKey(User,
+                             on_delete=models.CASCADE,
+                             related_name='cards',
+                             verbose_name='Пользователь',
+                             null=True, blank=True
+                             )
     pan = models.CharField(max_length=16,
                            unique=True,
                            verbose_name='Номер карты',
@@ -70,7 +72,7 @@ class BankCard(BaseModel):
                               verbose_name='Статус',
                               null=True, blank=True
                               )
-    token = models.CharField(max_length=255,
+    token = models.CharField(max_length=999,
                              verbose_name='Токен',
                              null=True, blank=True
                              )
@@ -90,6 +92,10 @@ class BankCard(BaseModel):
     @property
     def musk_expiration_date(self):
         return f'{self.expiration_date[:2]}/{self.expiration_date[-2:]}'
+
+    @property
+    def updated_at_ms(self):
+        return (timezone.now() - self.updated_at).seconds
 
 
 class Promotion(BaseModel):

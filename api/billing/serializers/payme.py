@@ -5,14 +5,63 @@ from rest_framework import serializers
 from apps.billing.payme.config import PAYME_MIN_AMOUNT
 from apps.billing.payme.exceptions import IncorrectAmount, PerformTransactionDoesNotExist
 from apps.billing.payme.models import MerchantTransactionsModel
-from apps.billing.models import UserPayment
-from utils import choices
+from apps.billing.models import UserPayment, User, BankCard
+from repository.auth_user import UserRepository
+from apps.auth_user import constants as user_constants
+from utils import choices, exceptions
 from utils.payme import get_params
 
 
 class SubscribeSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     params = serializers.JSONField()
+
+    def validate_id(self, value):
+        try:
+            UserRepository().get_user_by_uniq_id(value)
+        except User.DoesNotExist:
+            raise exceptions.NotFoundException(user_constants.USER_DOES_NOT_EXIST)
+        return value
+
+
+class VerifyCardSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField()
+    number = serializers.CharField(source='pan', required=True)
+    code = serializers.CharField(max_length=6)
+
+    class Meta:
+        model = BankCard
+        fields = (
+            'id',
+            'code',
+            'number'
+        )
+
+    def validate_id(self, value):
+        try:
+            UserRepository().get_user_by_uniq_id(value)
+        except User.DoesNotExist:
+            raise exceptions.NotFoundException(user_constants.USER_DOES_NOT_EXIST)
+        return value
+
+
+class RemoveCardSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField()
+    number = serializers.CharField(source='pan', required=True)
+
+    class Meta:
+        model = BankCard
+        fields = (
+            'id',
+            'number'
+        )
+
+    def validate_id(self, value):
+        try:
+            UserRepository().get_user_by_uniq_id(value)
+        except User.DoesNotExist:
+            raise exceptions.NotFoundException(user_constants.USER_DOES_NOT_EXIST)
+        return value
 
 
 class PaymeGeneratePayLinkSerializer(serializers.Serializer):

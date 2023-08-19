@@ -6,6 +6,9 @@ class UserServices:
     def __init__(self):
         self.user_repository = UserRepository()
 
+    def get_user_by_uniq_id(self, identity: int) -> User:
+        return self.user_repository.get_user_by_uniq_id(identity)
+
     def get_user_by_phone_number(self, phone_number: str) -> User:
         return self.user_repository.get_user_by_phone_number(phone_number)
 
