@@ -149,5 +149,3 @@ class UserClientViewSet(ActionSerializerMixin, ActionPermissionMixin, ReturnResp
     @extend_schema(tags=[Mobile.Client.PREFIX])
     def destroy(self, request, *args, **kwargs):
         return super().destroy(request, *args, **kwargs)
-
-# salom

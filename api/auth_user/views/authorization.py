@@ -7,6 +7,7 @@ from api.mixins import HandleExceptionMixin
 from apps.notifications.models import Token
 from service.auth_user import UserServices
 from service.notifications import EmailService
+from utils.decorators import calculate_time
 from utils.generates import generate_password
 # from rest_framework.response import Response
 from utils.responses import Response
@@ -70,6 +71,7 @@ class LoginTokenView(HandleExceptionMixin, GenericAPIView):
     serializer_class = TokenLoginSerializer
 
     @extend_schema(tags=[Mobile.Driver.AUTHORIZATION])
+    @calculate_time
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
