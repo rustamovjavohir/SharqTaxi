@@ -6,13 +6,13 @@ from service.auth_user import UserServices
 
 
 class BankCardUpdateSerializer(serializers.ModelSerializer):
-    phone_number = serializers.CharField(source='client.user.phone_number', required=False, read_only=True)
+    phone_number = serializers.CharField(source='user.phone_number', required=False, read_only=True)
 
     class Meta:
         model = BankCard
         fields = (
             'id',
-            'client',
+            'user',
             'phone_number',
             'pan',
             'card_holder',
@@ -23,7 +23,7 @@ class BankCardUpdateSerializer(serializers.ModelSerializer):
         )
         read_only_fields = (
             'id',
-            'client',
+            'user',
             'phone_number',
             'created_at',
             'updated_at'
@@ -35,13 +35,13 @@ class BankCardSerializer(serializers.ModelSerializer):
 
     number = serializers.SerializerMethodField()
 
-    phone_number = serializers.CharField(source='client.user.phone_number', required=True)
+    phone_number = serializers.CharField(source='user.phone_number', required=True)
 
     class Meta:
         model = BankCard
         fields = (
             'id',
-            'client',
+            'user',
             'phone_number',
             'number',
             'pan',
@@ -54,7 +54,7 @@ class BankCardSerializer(serializers.ModelSerializer):
         )
         read_only_fields = (
             'id',
-            'client',
+            'user',
             'is_active',
             'created_at',
             'updated_at'

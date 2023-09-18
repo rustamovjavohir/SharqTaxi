@@ -1,9 +1,10 @@
 from django.conf import settings
 
 DEBUG = settings.PAYME_SETTINGS['DEBUG']
-MERCHANT_ID = settings.PAYME_SETTINGS['ID']
+MERCHANT_ID = settings.PAYME_SETTINGS['ID'] if not DEBUG else "64d63b7d7d8d42482ae691d6"
 MERCHANT_KEY = settings.PAYME_SETTINGS['SECRET_KEY']
-AUTHORIZATION = {'X-Auth': '{}:{}'.format(MERCHANT_ID, MERCHANT_KEY)}
+# AUTHORIZATION = {'X-Auth': '{}:{}'.format(MERCHANT_ID, MERCHANT_KEY)}
+AUTHORIZATION = {'X-Auth': '{}'.format(MERCHANT_ID)}
 KEY_1 = settings.PAYME_SETTINGS['PAYME_ACCOUNT']['KEY_1']
 KEY_2 = settings.PAYME_SETTINGS['PAYME_ACCOUNT'].get('KEY_2', 'order_type')
 PAYME_MIN_AMOUNT = settings.PAYME_SETTINGS.get('PAYME_MIN_AMOUNT', 0)

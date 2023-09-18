@@ -3,7 +3,9 @@ import uuid
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
 from django.db import models
-from apps.billing import cosntants
+from django.utils import timezone
+
+from apps.billing import constants
 from utils import choices
 from utils.models import BaseModel
 from apps.auth_user.models import UserClient, UserDriver, User
@@ -11,38 +13,38 @@ from apps.auth_user.models import UserClient, UserDriver, User
 
 def validate_pan(value):
     if len(str(value)) != 16:
-        raise ValidationError(cosntants.PAN_MUST_BE_16_DIGITS)
+        raise ValidationError(constants.PAN_MUST_BE_16_DIGITS)
 
 
 def validate_expiration_date(value):
     value = str(value).replace(' ', '')
     if len(value) != 4:
-        raise ValidationError(cosntants.CARD_EXPIRATION_DATE_MUST_BE_4_DIGITS)
+        raise ValidationError(constants.CARD_EXPIRATION_DATE_MUST_BE_4_DIGITS)
     elif not value.isdigit():
-        raise ValidationError(cosntants.CARD_EXPIRATION_DATE_MUST_BE_ONLY_DIGITS)
+        raise ValidationError(constants.CARD_EXPIRATION_DATE_MUST_BE_ONLY_DIGITS)
 
 
 def validate_card_holder(value):
     if value.isdigit():
-        raise ValidationError(cosntants.CARD_HOLDER_MUST_BE_ONLY_LETTERS)
+        raise ValidationError(constants.CARD_HOLDER_MUST_BE_ONLY_LETTERS)
     str(value).capitalize()
 
 
 def validate_cvv(value):
     if len(str(value)) != 3:
-        raise ValidationError(cosntants.CVV_MUST_BE_3_DIGITS)
+        raise ValidationError(constants.CVV_MUST_BE_3_DIGITS)
     if not value.isdigit():
-        raise ValidationError(cosntants.CVV_MUST_BE_ONLY_DIGITS)
+        raise ValidationError(constants.CVV_MUST_BE_ONLY_DIGITS)
 
 
 class BankCard(BaseModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    client = models.ForeignKey(UserClient,
-                               on_delete=models.CASCADE,
-                               related_name='cards',
-                               verbose_name='Пользователь',
-                               null=True, blank=True
-                               )
+    user = models.ForeignKey(User,
+                             on_delete=models.CASCADE,
+                             related_name='cards',
+                             verbose_name='Пользователь',
+                             null=True, blank=True
+                             )
     pan = models.CharField(max_length=16,
                            unique=True,
                            verbose_name='Номер карты',
@@ -51,7 +53,8 @@ class BankCard(BaseModel):
                            )
     card_holder = models.CharField(max_length=255,
                                    validators=[validate_card_holder],
-                                   verbose_name='Держатель карты'
+                                   verbose_name='Держатель карты',
+                                   null=True, blank=True
                                    )
     expiration_date = models.CharField(max_length=4,
                                        help_text='Введите срок действия карты в формате ММГГ',
@@ -63,6 +66,17 @@ class BankCard(BaseModel):
                            verbose_name='CVV',
                            null=True, blank=True
                            )
+    status = models.CharField(max_length=255,
+                              choices=choices.BankCardStatusChoices.choices,
+                              default=choices.BankCardStatusChoices.PENDING,
+                              verbose_name='Статус',
+                              null=True, blank=True
+                              )
+    token = models.CharField(max_length=999,
+                             verbose_name='Токен',
+                             null=True, blank=True
+                             )
+    is_active = models.BooleanField(default=False, verbose_name='Активна')
 
     class Meta:
         verbose_name = 'Банковская карта'
@@ -78,6 +92,10 @@ class BankCard(BaseModel):
     @property
     def musk_expiration_date(self):
         return f'{self.expiration_date[:2]}/{self.expiration_date[-2:]}'
+
+    @property
+    def updated_at_ms(self):
+        return (timezone.now() - self.updated_at).seconds
 
 
 class Promotion(BaseModel):

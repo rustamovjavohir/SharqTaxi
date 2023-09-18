@@ -1,5 +1,7 @@
 from api.billing.serializers.payme import MerchantTransactionsModelSerializer
 from utils.payme import get_params
+from apps.billing import constants
+
 
 class CheckPerformTransaction:
     serializer = MerchantTransactionsModelSerializer
@@ -22,13 +24,8 @@ class CheckPerformTransaction:
             "result": {
                 "allow": True,
                 "additional": {
-                    "order_name": "Order 33"
+                    "cause": constants.PAYMENT_CAUSE
                 },
-                "detail": {
-                    "amount": 1000,
-                    "account": "12345678901234567890",
-                    "code": "1234"
-                }
             }
         }
 
