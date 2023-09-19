@@ -212,3 +212,15 @@ class UserDriverStatus(BaseModel):
 
     def __str__(self):
         return f'{self.driver} - {self.status}'
+
+
+class Captcha(BaseModel):
+    code = models.CharField(max_length=255,
+                            verbose_name='Токен')
+
+    class Meta:
+        verbose_name = 'Токен капчи'
+        verbose_name_plural = 'Токены капчи'
+
+    def __str__(self):
+        return f'{self.code}- {self.created_at}'

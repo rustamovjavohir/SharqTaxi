@@ -41,3 +41,9 @@ class UserServices:
 
     def set_user_password(self, user, password):
         return self.user_repository.set_new_password(user, password)
+
+    def generate_captcha(self):
+        return self.user_repository.generate_captcha()
+
+    def verify_captcha(self, captcha):
+        return self.user_repository.verify_captcha(captcha)

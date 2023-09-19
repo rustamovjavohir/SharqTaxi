@@ -1,3 +1,6 @@
+import base64
+from io import BytesIO
+
 from rest_framework import status
 from rest_framework.generics import GenericAPIView
 from rest_framework.views import APIView
@@ -9,18 +12,15 @@ from service.auth_user import UserServices
 from service.notifications import EmailService
 from utils.decorators import calculate_time
 from utils.generates import generate_password
-# from rest_framework.response import Response
 from utils.responses import Response
 from rest_framework.exceptions import AuthenticationFailed, ValidationError
-from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
 from drf_spectacular.utils import extend_schema
 from api.auth_user.serializers.authorization import (CustomObtainPairSerializer, CustomTokenRefreshSerializer,
                                                      CustomTokenVerifySerializer, LogoutSerializer,
-                                                     TokenLoginSerializer, TokenLogOutSerializer,
+                                                     TokenLoginSerializer, TokenLogOutSerializer, CaptchaSerializer,
                                                      )
 from apps.auth_user import constants
-from utils.utils import get_json_data
 from utils.swagger_tags import Mobile
 
 
@@ -106,3 +106,27 @@ class VerifyTokenView(HandleExceptionMixin, APIView):
                             status=status.HTTP_200_OK)
         return Response(message=constants.TOKEN_IS_INVALID_OR_EXPIRED,
                         success=False, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ReCaptchaApiView(HandleExceptionMixin, GenericAPIView):
+    serializer_class = CaptchaSerializer
+    permission_classes = [AllowAny, ]
+    services = UserServices()
+
+    @extend_schema(tags=[Mobile.Driver.AUTHORIZATION])
+    def get(self, request, *args, **kwargs):
+        byte = BytesIO()
+        captcha = self.services.generate_captcha()
+        captcha.save(byte, format=captcha.format)
+        byte = byte.getvalue()
+        byte = base64.b64encode(byte)
+        return Response(data=byte.__str__(), status=status.HTTP_200_OK)
+
+    @extend_schema(tags=[Mobile.Driver.AUTHORIZATION])
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        captcha = serializer.validated_data.get('captcha')
+        if not self.services.verify_captcha(captcha):
+            raise ValidationError(constants.CAPTCHA_IS_INVALID)
+        return Response(data=True, message=constants.CAPTCHA_IS_VALID, status=status.HTTP_200_OK)

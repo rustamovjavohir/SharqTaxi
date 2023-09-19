@@ -1,4 +1,3 @@
-from config import settings
 from utils.choices import UserRoleChoices
 from django.conf import settings
 
@@ -33,3 +32,6 @@ RESET_PASSWORD_TITLE = "Activation link for password reset"
 TOKEN_REFRESHED = 'Токен обновлен'
 TOKEN_IS_VALID = 'Токен действителен'
 TOKEN_IS_INVALID_OR_EXPIRED = 'Токен недействителен или просрочен'
+
+CAPTCHA_IS_INVALID = 'Капча неверная или просрочена'
+CAPTCHA_IS_VALID = 'Капча верная'
