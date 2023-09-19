@@ -71,12 +71,13 @@ THIRD_APP = [
     'drf_spectacular',
     'drf_spectacular_sidecar',
     'multiselectfield',
-
     # 'django.contrib.sites',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
+    'django_celery_beat',
+    'django_celery_results',
 ]
 
 INSTALLED_APPS = DEFAULT_APPS + LOCAL_APPS + THIRD_APP
@@ -500,7 +501,8 @@ REDIS_PORT = '6379'
 # broker_url = 'redis://' + REDIS_HOST + ':' + REDIS_PORT + '/0'
 # result_backend = 'redis://' + REDIS_HOST + ':' + REDIS_PORT + '/0'
 CELERY_BROKER_URL = "redis://" + REDIS_HOST + ":" + REDIS_PORT + "/0"
-CELERY_RESULT_BACKEND = "redis://" + REDIS_HOST + ":" + REDIS_PORT + "/0"
+# CELERY_RESULT_BACKEND = "redis://" + REDIS_HOST + ":" + REDIS_PORT + "/0"
+CELERY_RESULT_BACKEND = "django-db"  # it works
 accept_content = ['application/json']
 task_serializer = 'json'
 result_serializer = 'json'
@@ -508,6 +510,7 @@ broker_connection_retry_on_startup = True
 broker_transport_options = {'visibility_timeout': 60 * 60}
 timezone = 'Asia/Tashkent'
 task_always_eager = True  # delay() buyrugini yozish shart emas
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 # -------------------------------------------------CELERY---------------------------------------------------------------
 
 try:

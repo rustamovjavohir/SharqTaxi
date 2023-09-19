@@ -3,10 +3,12 @@ import random
 from django.shortcuts import get_object_or_404
 
 from apps.auth_user import constants
-from apps.auth_user.models import User, UserRole, UserDriver, UserClient
+from apps.auth_user.models import User, UserRole, UserDriver, UserClient, Captcha
+from apps.auth_user.tasks import create_deactivate_captcha_task
 from apps.notifications.models import Token
 from repository.vehicle import VehicleRepository, DriverLicenseRepository
 from utils.generates import generate_unique_code
+from utils.captcha import generate_captcha
 from repository.notifications import SmsRepository
 from rest_framework_simplejwt import tokens
 
@@ -20,6 +22,7 @@ class UserRepository:
         self.sms_repository = None
         self.car_repository = VehicleRepository()
         self.license_repository = DriverLicenseRepository()
+        self.captcha = Captcha
 
     def get_user_by_uniq_id(self, identity: int) -> User:
         if self.user_client.objects.filter(client_id=identity, is_active=True).exists():
@@ -111,3 +114,12 @@ class UserRepository:
             'access': str(tokens.AccessToken.for_user(user)),
             'refresh': str(tokens.RefreshToken.for_user(user)),
         }
+
+    def generate_captcha(self):
+        code = generate_unique_code(length=6)
+        captcha = self.captcha.objects.create(code=code)
+        create_deactivate_captcha_task(captcha.id)
+        return generate_captcha(code)
+
+    def verify_captcha(self, code):
+        return self.captcha.objects.filter(code=code, is_active=True).update(is_active=False)

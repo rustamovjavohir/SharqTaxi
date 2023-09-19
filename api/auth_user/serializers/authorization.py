@@ -132,3 +132,7 @@ class ResetPasswordSerializer(serializers.Serializer):
         if self.user_service.get_user_by_email(value) is None:
             raise serializers.ValidationError(constants.EMAIL_IS_INCORRECT)
         return value
+
+
+class CaptchaSerializer(serializers.Serializer):
+    captcha = serializers.CharField(required=True)
