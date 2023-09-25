@@ -108,7 +108,7 @@ class VerifyTokenView(HandleExceptionMixin, APIView):
                         success=False, status=status.HTTP_400_BAD_REQUEST)
 
 
-class ReCaptchaApiView(HandleExceptionMixin, GenericAPIView):
+class CaptchaApiView(HandleExceptionMixin, GenericAPIView):
     serializer_class = CaptchaSerializer
     permission_classes = [AllowAny, ]
     services = UserServices()
@@ -119,8 +119,10 @@ class ReCaptchaApiView(HandleExceptionMixin, GenericAPIView):
         captcha = self.services.generate_captcha()
         captcha.save(byte, format=captcha.format)
         byte = byte.getvalue()
-        byte = base64.b64encode(byte)
-        return Response(data=byte.__str__(), status=status.HTTP_200_OK)
+        data = {
+            'captcha': base64.b64encode(byte),
+        }
+        return Response(data=data, status=status.HTTP_200_OK)
 
     @extend_schema(tags=[Mobile.Driver.AUTHORIZATION])
     def post(self, request, *args, **kwargs):

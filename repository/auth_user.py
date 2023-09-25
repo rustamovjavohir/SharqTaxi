@@ -7,7 +7,7 @@ from apps.auth_user.models import User, UserRole, UserDriver, UserClient, Captch
 from apps.auth_user.tasks import create_deactivate_captcha_task
 from apps.notifications.models import Token
 from repository.vehicle import VehicleRepository, DriverLicenseRepository
-from utils.generates import generate_unique_code
+from utils.generates import generate_unique_code, generate_unique_code_with_chars
 from utils.captcha import generate_captcha
 from repository.notifications import SmsRepository
 from rest_framework_simplejwt import tokens
@@ -116,7 +116,7 @@ class UserRepository:
         }
 
     def generate_captcha(self):
-        code = generate_unique_code(length=6)
+        code = generate_unique_code_with_chars(length=6)
         captcha = self.captcha.objects.create(code=code)
         create_deactivate_captcha_task(captcha.id)
         return generate_captcha(code)

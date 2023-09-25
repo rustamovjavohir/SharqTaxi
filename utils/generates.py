@@ -1,10 +1,11 @@
-from string import ascii_letters
+from string import ascii_letters, ascii_lowercase
 
 from django.utils.crypto import get_random_string
 from time import time_ns
 from uuid import uuid4
 
 ALLOWED_NUMBERS = '1234567890'
+ALLOWED_CHARS = ascii_lowercase
 
 
 def generate_unique_code(length: int = 10) -> str:
@@ -18,6 +19,13 @@ def generate_password(length: int = 10) -> str:
     code = get_random_string(length=length, allowed_chars=ALLOWED_NUMBERS + ascii_letters)
     if code.startswith('0'):
         return generate_password()
+    return code
+
+
+def generate_unique_code_with_chars(length: int = 10) -> str:
+    code = get_random_string(length=length, allowed_chars=ALLOWED_NUMBERS + ALLOWED_CHARS)
+    if code.startswith('0'):
+        return generate_unique_code_with_chars()
     return code
 
 

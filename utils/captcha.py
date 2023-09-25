@@ -4,7 +4,7 @@ from PIL import Image
 from captcha.image import ImageCaptcha
 
 
-def generate_captcha(text="Hello captcha", height=220, width=440) -> Image:
+def generate_captcha(text="Hello captcha", height=80, width=160) -> Image:
     """
     Generate captcha image and returns it with bytes data
     """

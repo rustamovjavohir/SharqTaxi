@@ -1,7 +1,7 @@
 from django.urls import path, include
 
 from api.auth_user.views.authorization import (LoginView, GetRefreshTokenView, CustomTokenVerifyView, LogoutView, \
-                                               LoginTokenView, LogOutTokenView, VerifyTokenView, ReCaptchaApiView)
+                                               LoginTokenView, LogOutTokenView, VerifyTokenView, CaptchaApiView)
 from api.auth_user.views.user import (ProfileUserView, ChangePasswordView, ResetPasswordView)
 from api.auth_user.routers import router
 
@@ -15,7 +15,7 @@ auth_jwt_urlpatterns = [
 auth_token_urlpatterns = [
     path('login/', LoginTokenView.as_view(), name='token-login'),
     path('logout/', LogOutTokenView.as_view(), name='token-logout'),
-    path('captcha/', ReCaptchaApiView.as_view(), name='captcha'),
+    path('captcha/', CaptchaApiView.as_view(), name='captcha'),
 ]
 
 user_urlpatterns = [
