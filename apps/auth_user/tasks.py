@@ -3,6 +3,7 @@ import json
 from celery import shared_task
 from django_celery_beat.models import PeriodicTask, IntervalSchedule
 from apps.auth_user.models import Captcha
+from datetime import datetime, timedelta
 
 interval_6_hour, _ = IntervalSchedule.objects.get_or_create(
     every=6,
@@ -18,6 +19,12 @@ interval_10_second, _ = IntervalSchedule.objects.get_or_create(
 @shared_task
 def deactivate_captcha(captcha_id):
     Captcha.objects.filter(id=captcha_id).update(is_active=False)
+
+
+@shared_task
+def deactivate_captcha_daily():
+    date = datetime.now() - timedelta(hours=6)
+    Captcha.objects.filter(is_active=True, created_at__lte=date).update(is_active=False)
 
 
 def create_deactivate_captcha_task(captcha_id):

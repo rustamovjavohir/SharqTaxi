@@ -473,13 +473,13 @@ LOGGERS = {
     },
 }
 
-# LOGGING = {
-#     "version": 1,
-#     "disable_existing_loggers": False,
-#     "formatters": FORMATTER,
-#     "handlers": HANDLERS,
-#     "loggers": LOGGERS,
-# }
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": FORMATTER,
+    "handlers": HANDLERS,
+    "loggers": LOGGERS,
+}
 # -------------------------------------------------CACHING--------------------------------------------------------------
 CACHES = {
     "default": {
