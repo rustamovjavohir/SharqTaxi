@@ -222,5 +222,3 @@ config/local_settings.py
 
 # fixtures files
 /fixtures/*.json
-
-logs/*
